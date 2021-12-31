@@ -1,0 +1,27 @@
+{
+  "name": "hsl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "generate-password": "^1.7.0",
+    "jsonwebtoken": "^8.5.1",
+    "nanoid": "^3.1.30",
+    "nodemailer": "^6.7.2",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.12.4"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0"
+  }
+}
