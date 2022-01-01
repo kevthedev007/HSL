@@ -14,12 +14,14 @@ const clientRegister = async (req, res) => {
 
     try {
         //check if referrer exists
-        const checkRef = await User.findOne({ where: { referral_code } })
-        if (!checkRef || null) return res.status(400).json({
-            success: "false",
-            code: 400,
-            message: "invalid link/referral code"
-        })
+        if (referral_code) {
+            const checkRef = await User.findOne({ where: { referral_code } })
+            if (!checkRef || null) return res.status(400).json({
+                success: "false",
+                code: 400,
+                message: "invalid link/referral code"
+            })
+        }
 
         //check if email is unique
         const checkEmail = await User.findOne({ where: { email } })

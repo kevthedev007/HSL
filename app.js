@@ -7,7 +7,7 @@ const app = express();
 
 //importing routes
 const authRoutes = require('./routes/authRoutes')
-
+const adminRoutes = require('./routes/adminRoutes')
 
 
 //adding middlewares
@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: 'Welcome to HSL API' })
 })
 app.use('/auth', authRoutes)
+app.use('/admin', adminRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not Found')

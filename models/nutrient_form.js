@@ -37,7 +37,8 @@ module.exports = (sequelize, DataTypes) => {
     habits: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('habits').split(',')
+        const rawValue = this.getDataValue('habits');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('habits', val.join(','));
@@ -46,7 +47,8 @@ module.exports = (sequelize, DataTypes) => {
     current_health_complaints: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('current_health_complaints').split(',')
+        const rawValue = this.getDataValue('current_health_complaints');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('current_health_complaints', val.join(','));
@@ -55,7 +57,8 @@ module.exports = (sequelize, DataTypes) => {
     current_medication: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('current_medication').split(',')
+        const rawValue = this.getDataValue('current_medication');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('current_medication', val.join(','));
@@ -67,7 +70,8 @@ module.exports = (sequelize, DataTypes) => {
     family_history: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('family_history').split(',')
+        const rawValue = this.getDataValue('family_history');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('family_history', val.join(','));
@@ -76,7 +80,8 @@ module.exports = (sequelize, DataTypes) => {
     allergies: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('allergies').split(',')
+        const rawValue = this.getDataValue('allergies');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('allergies', val.join(','));
@@ -85,7 +90,8 @@ module.exports = (sequelize, DataTypes) => {
     desired_lifestyle: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('desired_lifestyle').split(',')
+        const rawValue = this.getDataValue('desired_lifestyle');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('desired_lifestyle', val.join(','));
@@ -94,7 +100,8 @@ module.exports = (sequelize, DataTypes) => {
     preferred_drug_form: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('prefered_drug_form').split(',')
+        const rawValue = this.getDataValue('preferred_drug_form');
+        return rawValue ? rawValue.split(',') : null
       },
       set(val) {
         this.setDataValue('preferred_drug_form', val.join(','));
