@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         as: "client", onDelete: 'CASCADE'
       });
     }
+
+    toJSON() {
+      return { ...this.get(), id: undefined, createdAt: undefined, updatedAt: undefined }
+    }
   };
   Client_Details.init({
     userId: {

@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         as: "client", onDelete: 'CASCADE'
       });
     }
+
+    toJSON() {
+      return { ...this.get(), userIdd: undefined, result: undefined, createdAt: undefined, updatedAt: undefined }
+    }
   };
 
   Nutrient_Form.init({
@@ -108,7 +112,12 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     usual_health_spending: DataTypes.STRING,
-    proposed_monthly_budget: DataTypes.STRING
+    proposed_monthly_budget: DataTypes.STRING,
+    result: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
   }, {
     sequelize,
     modelName: 'Nutrient_Form',

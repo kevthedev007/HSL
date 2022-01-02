@@ -19,10 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: { name: "userId", allowNull: false },
         as: "client_details",
       });
-      User.hasOne(Nutrient_Form, {
+      User.hasMany(Nutrient_Form, {
         foreignKey: { name: "userId", allowNull: false },
         as: "nutrient_form",
       });
+    }
+
+    toJSON() {
+      return { ...this.get(), createdAt: undefined, updatedAt: undefined }
     }
   };
   User.init({

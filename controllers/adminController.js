@@ -1,10 +1,17 @@
 const { User, Client_Details, Nutrient_Form } = require('../models/index');
+const sequelize = require('sequelize');
+
 
 const getForms = async (req, res) => {
     try {
-        const forms = await Nutrient_Form.findAll();
+        const forms = await Nutrient_Form.findAll({
+            include: 'client',
+        });
+
         const data = forms.map(form => {
             return {
+                username: form.client.username,
+                email: form.client.email,
                 weight: form.weight,
                 height: form.height,
                 habits: form.habits,

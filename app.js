@@ -8,6 +8,7 @@ const app = express();
 //importing routes
 const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/adminRoutes')
+const clientRoutes = require('./routes/clientRoutes')
 
 
 //adding middlewares
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 })
 app.use('/auth', authRoutes)
 app.use('/admin', adminRoutes)
+app.use('/client', clientRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not Found')
