@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Role, Client_Details, Nutrient_Form }) {
+    static associate({ Role, Client_Details, Nutrient_Form, Blog }) {
       // define association here
       User.belongsTo(Role, {
         foreignKey: { name: "roleId", allowNull: false },
@@ -23,7 +23,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: { name: "userId", allowNull: false },
         as: "nutrient_form",
       });
-    }
+      User.hasMany(Blog, {
+        foreignKey: { name: "userId", allowNull: false },
+        as: "blog",
+      });
+    };
+
 
     toJSON() {
       return { ...this.get(), createdAt: undefined, updatedAt: undefined }

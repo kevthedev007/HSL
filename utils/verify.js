@@ -16,5 +16,9 @@ const verifyToken = (req, res, next) => {
     }
 }
 
+//TODO: admin role
+
+//TODO: principal role
+
 
 module.exports = { verifyToken }

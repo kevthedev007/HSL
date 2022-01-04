@@ -9,6 +9,7 @@ const app = express();
 const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const clientRoutes = require('./routes/clientRoutes')
+const blogRoutes = require('./routes/blogRoutes')
 
 
 //adding middlewares
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes)
 app.use('/admin', adminRoutes)
 app.use('/client', clientRoutes)
+app.use('/blog', blogRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not Found')
