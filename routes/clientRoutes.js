@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router();
-const { getProfile, editProfile, updateNutrient } = require('../controllers/clientController');
+const { dashboard, getProfile, editProfile, updateNutrient } = require('../controllers/clientController');
 const { verifyToken } = require('../utils/verify')
 
+router.get('/dashboard', verifyToken, dashboard)
 router.get('/profile', verifyToken, getProfile)
-router.post('/edit-profile', verifyToken, editProfile)
-router.post('/update-nutrient', verifyToken, updateNutrient)
+router.put('/edit-profile', verifyToken, editProfile)
+router.put('/update-nutrient', verifyToken, updateNutrient)
 
 module.exports = router;

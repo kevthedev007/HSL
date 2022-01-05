@@ -17,8 +17,22 @@ const verifyToken = (req, res, next) => {
 }
 
 //TODO: admin role
+const admin_role = async (req, res, next) => {
+
+    try {
+        const admin = await User.findOne({ where: { id: req.user.id, roleId: 4 } })
+
+        if (admin) {
+            next()
+        } else {
+            return res.status(403).send('Page restricted! Admin role required!')
+        }
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+}
 
 //TODO: principal role
 
 
-module.exports = { verifyToken }
+module.exports = { verifyToken, admin_role }

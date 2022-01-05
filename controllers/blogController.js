@@ -38,7 +38,7 @@ const postBlog = async (req, res) => {
             message: "Blog added successfully",
         })
     } catch (error) {
-        res.status(400).json(errpr.message)
+        res.status(400).json(error.message)
     }
 }
 

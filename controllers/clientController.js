@@ -1,6 +1,24 @@
 const { User, Client_Details, Nutrient_Form } = require('../models/index');
 const sequelize = require('sequelize');
 
+const dashboard = async (req, res) => {
+    try {
+        const detail = await Client_Details.findOne({
+            where: { userId: req.user.id },
+            attributes: ['nickname']
+        })
+        return res.status(200).json({
+            success: true,
+            code: 200,
+            message: "successful",
+            data: {
+                detail
+            }
+        })
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+}
 
 const getProfile = async (req, res) => {
     try {
@@ -8,11 +26,15 @@ const getProfile = async (req, res) => {
             where: {
                 userId: req.user.id
             },
-            attributes: ['nickname', 'whatsapp_number', 'address']
+            attributes: ['nickname', 'whatsapp_number', 'address'],
+            include: {
+                model: User, as: 'client',
+                attributes: ['email']
+            }
         })
 
         //get latest record of nutrient_form
-        const nutrient = await Nutrient_Form.findAll({
+        const nutrient = await Nutrient_Form.findOne({
             limit: 1,
             where: {
                 userId: req.user.id
@@ -45,14 +67,42 @@ const editProfile = async (req, res) => {
         if (req.body.whatsapp_number) {
             match.whatsapp_number = req.body.whatsapp_number
         }
+
         if (req.body.address) {
             match.address = req.body.address
         }
 
-        const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
-        const user = await User.update({ email: req.body.email }, { where: { id: req.user.id } })
-        return res.status(200).send('Update Successful')
+        //check user's email to see if it wasn't changed
+        const userEmail = await User.findOne({ where: { id: req.user.id } })
+        if (userEmail.email == req.body.email) {
+            const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
+            return res.status(200).json({
+                success: true,
+                code: 200,
+                message: "Profile Updated Successfully"
+            })
+        } else {
+            //if email was changed
+            //check if email exists already
+            const checkEmail = await User.findOne({ where: { email: req.body.email } });
 
+            if (checkEmail) {
+                return res.status(200).json({
+                    success: true,
+                    code: 200,
+                    message: "Email already exists"
+                })
+
+            } else {
+                const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
+                const user = await User.update({ email: req.body.email }, { where: { id: req.user.id } })
+                return res.status(200).json({
+                    success: true,
+                    code: 200,
+                    message: "Profile Updated Successfully"
+                })
+            }
+        }
 
     } catch (error) {
         res.status(400).json(error.message)
@@ -109,7 +159,7 @@ const updateNutrient = async (req, res) => {
             match.proposed_monthly_budget = req.body.proposed_monthly_budget
         }
 
-        //check if nutrient-form already has a report
+        //check if nutrient-form already has a report(result)
         //if yes, create new form
         //if no, update current form
 
@@ -138,6 +188,6 @@ const updateNutrient = async (req, res) => {
     }
 }
 
-module.exports = { getProfile, editProfile, updateNutrient }
+module.exports = { dashboard, getProfile, editProfile, updateNutrient }
 
 

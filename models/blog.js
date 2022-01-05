@@ -1,7 +1,9 @@
 'use strict';
+const { set } = require('express/lib/application');
 const {
   Model
 } = require('sequelize');
+const zlib = require('zlib')
 module.exports = (sequelize, DataTypes) => {
   class Blog extends Model {
     /**
@@ -32,8 +34,28 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     title: DataTypes.STRING,
-    category: DataTypes.STRING,
-    description: DataTypes.STRING
+    category: {
+      type: DataTypes.STRING,
+      get() {
+        const rawValue = this.getDataValue('category');
+        return rawValue ? rawValue.split(',') : null
+      },
+      set(val) {
+        this.setDataValue('category', val.join(','));
+      }
+    },
+    description: {
+      type: DataTypes.STRING,
+      get() {
+        const value = this.getDataValue('description');
+        const uncompressed = zlib.inflateSync(Buffer.from(value, 'base64'));
+        return uncompressed.toString();
+      },
+      set(value) {
+        const compressed = zlib.deflateSync(value).toString('base64');
+        this.setDataValue('description', compressed)
+      }
+    }
   }, {
     sequelize,
     modelName: 'Blog',

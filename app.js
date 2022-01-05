@@ -18,10 +18,7 @@ app.use(cors({
 }))
 app.use(bodyParser.urlencoded({ extended: false, limit: '60mb' }))
 app.use(bodyParser.json({ limit: '50mb' }))
-app.use(compression())
-
-
-
+app.use(compression());
 
 //routes
 app.get('/', (req, res) => {

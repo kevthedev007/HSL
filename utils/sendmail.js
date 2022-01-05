@@ -20,6 +20,7 @@ function sendMail(email, username, password) {
         to: email, // list of receivers
         subject: "Login Details", // Subject line
         html: `<h1>Login Details</h1>
+            <p>Hello ${email}, your login details are provided below: </p>
              <h2>username: ${username}</h2>
              <h2>password: ${password}</h2>
             `

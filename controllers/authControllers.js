@@ -170,11 +170,23 @@ const createAdmin = async (req, res) => {
     const { email, password } = req.body
 
     try {
+        //check email
+        const checkEmail = await User.findOne({
+            where: { email }
+        })
+
+        if (checkEmail) return res.status(400).json({
+            success: "false",
+            code: 400,
+            message: "Email Already Exists"
+        });
+
         const user = await User.create({ email, password, roleId: 4 });
         res.status(200).send('admin created')
     } catch (error) {
         res.status(400).json(error.message)
     }
 }
+
 
 module.exports = { clientRegister, clientSignin, adminSignin, createAdmin }
