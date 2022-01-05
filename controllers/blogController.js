@@ -64,4 +64,19 @@ const getOneBlog = async (req, res) => {
     }
 }
 
-module.exports = { getBlogs, postBlog, getOneBlog }
+const deleteBlog = async (req, res) => {
+    const id = req.query.id;
+
+    try {
+        const blog = await Blog.destroy({ where: { id } });
+        return res.status(200).json({
+            success: true,
+            code: 200,
+            message: "Blog has been successfully deleted"
+        })
+    } catch (error) {
+
+    }
+}
+
+module.exports = { getBlogs, postBlog, getOneBlog, deleteBlog }
