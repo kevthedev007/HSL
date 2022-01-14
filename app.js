@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const clientRoutes = require('./routes/clientRoutes')
 const blogRoutes = require('./routes/blogRoutes')
+const productRoutes = require('./routes/productRoutes')
 
 
 //adding middlewares
@@ -28,6 +29,7 @@ app.use('/auth', authRoutes)
 app.use('/admin', adminRoutes)
 app.use('/client', clientRoutes)
 app.use('/blog', blogRoutes)
+app.use('/product', productRoutes)
 
 app.use((req, res, next) => {
   const error = new Error('Not Found')

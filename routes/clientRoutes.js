@@ -6,6 +6,6 @@ const { verifyToken } = require('../utils/verify')
 router.get('/dashboard', verifyToken, dashboard)
 router.get('/profile', verifyToken, getProfile)
 router.put('/edit-profile', verifyToken, editProfile)
-router.put('/update-nutrient', verifyToken, updateNutrient)
+router.put('/update-nutrient/:id', verifyToken, updateNutrient)
 
 module.exports = router;

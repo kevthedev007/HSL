@@ -104,7 +104,7 @@ const editProfile = async (req, res) => {
 }
 
 const updateNutrient = async (req, res) => {
-  const id = req.query.id
+  const id = req.params.id
 
   try {
     const nutrient = await Nutrient_Form.findOne({
