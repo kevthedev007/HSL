@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), userIdd: undefined, result: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), userId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   };
 
@@ -114,6 +114,11 @@ module.exports = (sequelize, DataTypes) => {
     usual_health_spending: DataTypes.STRING,
     proposed_monthly_budget: DataTypes.STRING,
     result: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    endorsed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
