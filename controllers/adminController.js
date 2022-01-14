@@ -1,4 +1,4 @@
-const { User, Client_Details, Nutrient_Form, Product, Product_Detail } = require('../models/index');
+const { User, Client_Details, Nutrient_Form, Nutrient_Result, Suggested_Nutrient, Recommended_Supplement } = require('../models/index');
 const sequelize = require('sequelize');
 const cloudinary = require('../utils/cloudinary');
 const upload = require('../utils/multer');
@@ -158,10 +158,83 @@ const getFormById = async (req, res) => {
 
 
 const writeReport = async (req, res) => {
+  const { beneficiary_overview, research_suggestion, vitamins, minerals, herbs, foods, fruits, gold_package, platinum_package, diamond_package } = req.body;
+
+  try {
+    const formId = req.params.formId;
+    //check if form exists
+    const form = await Nutrient_Form.findOne({
+      where: { id: formId, result: false }
+    })
+
+    if (!form) return res.status(200).json({
+      success: false,
+      code: 400,
+      message: "Nutrient Form doesnt exist",
+    })
+
+    const result = await Nutrient_Result.create({
+      formId: req.params.formId,
+      endorsed: true,
+      beneficiary_overview, research_suggestion
+    })
+
+    const nutrients = await Suggested_Nutrient.create({
+      formId: req.params.formId,
+      resultId: result.id,
+      vitamins, minerals, herbs, foods, fruits
+    })
+
+    const supplements = await Recommended_Supplement.create({
+      formId: req.params.formId,
+      resultId: result.id,
+      gold_package, platinum_package, diamond_package
+    })
+
+    //update form result and endorse
+    const form = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
+
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "Report has been generated and endorsed",
+    })
+
+  } catch (error) {
+    res.status(500).json(error.message)
+  }
 }
 
 
 const endorseReport = async (req, res) => {
+  try {
+    const formId = req.params.formId;
+
+    //check if form exists
+    const form = await Nutrient_Form.findOne({
+      where: { id: formId, result: false }
+    })
+
+    if (!form) return res.status(200).json({
+      success: false,
+      code: 400,
+      message: "Nutrient Form doesnt exist",
+    })
+
+    //update form and endorse
+    const report = await Nutrient_Result.update({ endorsed: true }, { where: { formId } })
+
+    const form = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
+
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "Report has been generated and endorsed",
+    })
+
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 }
 
 
