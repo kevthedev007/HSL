@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
         as: "product_details",
       });
     }
+    toJSON() {
+      return { ...this.get(), createdAt: undefined, updatedAt: undefined }
+    }
   };
   Product.init({
     id: {

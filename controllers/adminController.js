@@ -192,7 +192,7 @@ const writeReport = async (req, res) => {
     })
 
     //update form result and endorse
-    const form = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
+    const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
 
     return res.status(200).json({
       success: true,
@@ -212,7 +212,7 @@ const endorseReport = async (req, res) => {
 
     //check if form exists
     const form = await Nutrient_Form.findOne({
-      where: { id: formId, result: false }
+      where: { id: formId, result: true, endorsed: false }
     })
 
     if (!form) return res.status(200).json({
@@ -220,16 +220,19 @@ const endorseReport = async (req, res) => {
       code: 400,
       message: "Nutrient Form doesnt exist",
     })
-
     //update form and endorse
-    const report = await Nutrient_Result.update({ endorsed: true }, { where: { formId } })
+    console.log('here')
+    //find report
+    const report = await Nutrient_Result.findOne({ where: { formId } })
+    report.endorsed = true
+    await report.save();
 
-    const form = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
+    const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
 
     return res.status(200).json({
       success: true,
       code: 200,
-      message: "Report has been generated and endorsed",
+      message: "Report has been endorsed",
     })
 
   } catch (error) {
@@ -240,4 +243,4 @@ const endorseReport = async (req, res) => {
 
 
 
-module.exports = { getForms, getFormsByReport, getFormsByEndorsed, getFormById }
+module.exports = { getForms, getFormsByReport, getFormsByEndorsed, getFormById, writeReport, endorseReport }

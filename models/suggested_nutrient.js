@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
         as: "nutrient_result", onDelete: 'CASCADE'
       });
     }
+    toJSON() {
+      return { ...this.get(), id: undefined, formId: undefined, resultId: undefined, createdAt: undefined, updatedAt: undefined }
+    }
   };
   Suggested_Nutrient.init({
     id: {
@@ -69,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
         return rawValue ? rawValue.split(',') : null
       },
       set(val) {
-        this.setDataValue('herbs', val.join(','));
+        this.setDataValue('herbs', val.join(',')) || null;
       }
     },
     foods: {

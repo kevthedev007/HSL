@@ -1,4 +1,4 @@
-const { User, Client_Details, Nutrient_Form } = require('../models/index');
+const { User, Client_Details, Nutrient_Form, Product } = require('../models/index');
 const sequelize = require('sequelize');
 
 const dashboard = async (req, res) => {
@@ -133,7 +133,7 @@ const updateNutrient = async (req, res) => {
     if (nutrient.endorsed == false) {
       //update nutrient_form
       const update = await Nutrient_Form.update(match, { where: { id } })
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         code: 200,
         message: "Nutrient Form updated successfully"
@@ -142,7 +142,7 @@ const updateNutrient = async (req, res) => {
       //create a new nutrient form
       match.userId = req.user.id
       const nutrient = await Nutrient_Form.create(match)
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         code: 200,
         message: "Nutrient Form created successfully"
@@ -154,6 +154,43 @@ const updateNutrient = async (req, res) => {
   }
 }
 
-module.exports = { dashboard, getProfile, editProfile, updateNutrient }
+const getReport = async (req, res, next) => {
+  try {
+    const nutrient = await Nutrient_Form.findOne({
+      where: { userId: req.user.id },
+      include: ['nutrient_result', 'suggested_nutrient', 'recommended_supplement'],
+      order: [['createdAt', 'DESC']]
+    })
+
+    if (nutrient.endorsed == false) return res.json('form is not ready')
+
+    //get products
+    const products = await Product.findAll();
+
+    const goldPackage = products.filter(x => nutrient.recommended_supplement.gold_package.includes(x.id))
+    const platinumPackage = products.filter(x => nutrient.recommended_supplement.platinum_package.includes(x.id))
+    const diamondPackage = products.filter(x => nutrient.recommended_supplement.diamond_package.includes(x.id))
+
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "successful",
+      data: {
+        Beneficiary_Overview: nutrient.nutrient_result.beneficiary_overview,
+        Research_Suggestion: nutrient.nutrient_result.research_suggestion,
+        Suggested_Nutrients: nutrient.suggested_nutrient,
+        Recommened_Supplement: {
+          Gold_Package: goldPackage,
+          Platinum_Package: platinumPackage,
+          Diamond_Package: diamondPackage
+        }
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+module.exports = { dashboard, getProfile, editProfile, updateNutrient, getReport }
 
 
