@@ -7,16 +7,9 @@ const dashboard = async (req, res) => {
       where: { userId: req.user.id },
       attributes: ['nickname']
     })
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        detail
-      }
-    })
+    return res.status(200).json({ detail })
   } catch (error) {
-    res.status(500).json(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -43,16 +36,11 @@ const getProfile = async (req, res) => {
     })
 
     return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        profile,
-        nutrient
-      }
+      profile,
+      nutrient
     })
   } catch (error) {
-    res.status(500).json(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -70,36 +58,24 @@ const editProfile = async (req, res) => {
     const userEmail = await User.findOne({ where: { id: req.user.id } })
     if (userEmail.email == req.body.email) {
       const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
-      return res.status(200).json({
-        success: true,
-        code: 200,
-        message: "Profile Updated Successfully"
-      })
+      return res.status(200).json({ message: "Profile Updated Successfully" })
     } else {
       //if email was changed
       //check if the new email exists already on the database
       const checkEmail = await User.findOne({ where: { email: req.body.email } });
 
       if (checkEmail) {
-        return res.status(200).json({
-          success: true,
-          code: 200,
-          message: "Email already exists"
-        })
+        return res.status(200).json({ message: "Email already exists" })
 
       } else {
         const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
         const user = await User.update({ email: req.body.email }, { where: { id: req.user.id } })
-        return res.status(200).json({
-          success: true,
-          code: 200,
-          message: "Profile Updated Successfully"
-        })
+        return res.status(200).json({ message: "Profile Updated Successfully" })
       }
     }
 
   } catch (error) {
-    res.status(400).json(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -120,6 +96,7 @@ const updateNutrient = async (req, res) => {
       current_medication: req.body.current_medication || nutrient.current_medication || null,
       health_fear: req.body.health_fear || nutrient.health_fear || null,
       family_history: req.body.family_history || nutrient.family_history || null,
+      allergies: req.body.allergies || nutrient.allergies || null,
       desired_lifestyle: req.body.desired_lifestyle || nutrient.desired_lifestyle || null,
       preferred_drug_form: req.body.preferred_drug_form || nutrient.preferred_drug_form || null,
       usual_health_spending: req.body.usual_health_spending || nutrient.usual_health_spending || null,
@@ -133,24 +110,16 @@ const updateNutrient = async (req, res) => {
     if (nutrient.endorsed == false) {
       //update nutrient_form
       const update = await Nutrient_Form.update(match, { where: { id } })
-      return res.status(200).json({
-        success: true,
-        code: 200,
-        message: "Nutrient Form updated successfully"
-      })
+      return res.status(201).json({ message: "Nutrient Form updated successfully" })
     } else {
       //create a new nutrient form
       match.userId = req.user.id
       const nutrient = await Nutrient_Form.create(match)
-      return res.status(200).json({
-        success: true,
-        code: 200,
-        message: "Nutrient Form created successfully"
-      })
+      return res.status(201).json({ message: "Nutrient Form created successfully" })
     }
 
   } catch (error) {
-    res.status(400).json(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -162,7 +131,7 @@ const getReport = async (req, res, next) => {
       order: [['createdAt', 'DESC']]
     })
 
-    if (nutrient.endorsed == false) return res.json('form is not ready')
+    if (nutrient.endorsed == false) return res.json({ message: 'form is not ready' })
 
     //get products
     const products = await Product.findAll();
@@ -172,22 +141,17 @@ const getReport = async (req, res, next) => {
     const diamondPackage = products.filter(x => nutrient.recommended_supplement.diamond_package.includes(x.id))
 
     return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        Beneficiary_Overview: nutrient.nutrient_result.beneficiary_overview,
-        Research_Suggestion: nutrient.nutrient_result.research_suggestion,
-        Suggested_Nutrients: nutrient.suggested_nutrient,
-        Recommened_Supplement: {
-          Gold_Package: goldPackage,
-          Platinum_Package: platinumPackage,
-          Diamond_Package: diamondPackage
-        }
+      Beneficiary_Overview: nutrient.nutrient_result.beneficiary_overview,
+      Research_Suggestion: nutrient.nutrient_result.research_suggestion,
+      Suggested_Nutrients: nutrient.suggested_nutrient,
+      Recommened_Supplement: {
+        Gold_Package: goldPackage,
+        Platinum_Package: platinumPackage,
+        Diamond_Package: diamondPackage
       }
     })
   } catch (err) {
-    next(err)
+    return res.status(500).json({ error: error.message })
   }
 }
 

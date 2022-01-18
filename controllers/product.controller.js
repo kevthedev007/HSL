@@ -6,23 +6,16 @@ const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll({
       attributes: { exclude: ['createdAt', 'updatedAt', 'cloudinary_id'] },
-      include: {
-        model: Product_Detail, as: 'product_details',
-        attributes: { exclude: ['productId', 'createdAt', 'updatedAt'] }
-      }
+      // include: {
+      //   model: Product_Detail, as: 'product_details',
+      //   attributes: { exclude: ['productId', 'createdAt', 'updatedAt'] }
+      // }
     })
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        products
-      }
-    })
+    return res.status(200).json({ products })
 
   } catch (err) {
-    next(err)
+    return res.status(500).json({ error: err.message })
   }
 }
 
@@ -40,17 +33,12 @@ const getProductById = async (req, res) => {
       }
     })
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        product
-      }
-    })
+    if (!product) return res.status(400).json({ message: 'Product does not exist' })
+
+    return res.status(200).json({ product })
 
   } catch (error) {
-    res.status(500).json(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -78,15 +66,10 @@ const addProduct = async (req, res, next) => {
       body_care, habits, lifestyle_goals, gender, age, career_type, brands
     })
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: 'Product has been added to the store successfully'
-    })
+    return res.status(201).json({ message: 'Product has been added to the store successfully' })
 
   } catch (err) {
-    // res.status(400).send(err.messsage)
-    next(err)
+    return res.status(500).json({ error: err.message })
   }
 }
 
@@ -103,6 +86,8 @@ const editProduct = async (req, res) => {
         attributes: { exclude: ['productId', 'createdAt', 'updatedAt'] }
       }
     })
+
+    if (!product) return res.status(400).json({ message: 'product does not exist' })
 
     const productMatch = {
       name: req.body.name || product.name,
@@ -126,11 +111,7 @@ const editProduct = async (req, res) => {
     const productUpdate = await Product.update(productMatch, { where: { id } });
     const detailsUpdate = await Product_Detail.update(detailsMatch, { where: { productId: id } })
 
-    res.status(200).json({
-      success: true,
-      code: 200,
-      message: "Product updated successfully"
-    })
+    res.status(200).json({ message: "Product updated successfully" })
 
   } catch (error) {
     res.status(400).json(error.message)

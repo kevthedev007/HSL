@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const { verifyToken, admin_role } = require('../utils/verify')
-const { getForms, getFormById, getFormsByReport, getFormsByEndorsed, writeReport, endorseReport } = require('../controllers/adminController')
+const { getForms, getFormById, getFormsByReport, getFormsByEndorsed, writeReport, endorseReport } = require('../controllers/admin.controller')
 
 
 router.get('/nutrient-forms', [verifyToken, admin_role], getForms);

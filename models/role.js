@@ -17,19 +17,13 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    toJSON() {
-      return {
-        ...this.get(),
-        createdAt: undefined,
-        updatedAt: undefined
-      };
-    }
   };
   Role.init({
     name: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Role',
+    timestamps: false
   });
   return Role;
 };

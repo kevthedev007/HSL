@@ -1,7 +1,4 @@
 const { User, Client_Details, Nutrient_Form, Nutrient_Result, Suggested_Nutrient, Recommended_Supplement } = require('../models/index');
-const sequelize = require('sequelize');
-const cloudinary = require('../utils/cloudinary');
-const upload = require('../utils/multer');
 
 
 const getForms = async (req, res) => {
@@ -23,17 +20,10 @@ const getForms = async (req, res) => {
         endorsed: form.endorsed
       }
     })
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        data
-      }
-    })
+    return res.status(200).json({ data })
 
   } catch (error) {
-    res.status(500).json(error.messsage)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 
@@ -59,16 +49,9 @@ const getFormsByReport = async (req, res) => {
         endorsed: form.endorsed
       }
     })
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        data
-      }
-    })
+    return res.status(200).json({ data })
   } catch (error) {
-    res.status(500).json(error.messsage)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 
@@ -93,17 +76,10 @@ const getFormsByEndorsed = async (req, res) => {
         endorsed: form.endorsed
       }
     })
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        data
-      }
-    })
+    return res.status(200).json({ data })
 
   } catch (error) {
-    res.status(500).json(error.messsage)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 
@@ -116,6 +92,7 @@ const getFormById = async (req, res) => {
       where: { id },
       include: 'client',
     })
+    if (!form) return res.status(200).json({ message: 'form does not exist' })
 
     const details = await Client_Details.findOne({ where: { userId: form.userId } })
 
@@ -142,17 +119,10 @@ const getFormById = async (req, res) => {
       endorsed: form.endorsed
     }
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "successful",
-      data: {
-        data
-      }
-    })
+    return res.status(200).json({ data })
 
   } catch (error) {
-    res.status(500).json(error.messsage)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 
@@ -167,11 +137,7 @@ const writeReport = async (req, res) => {
       where: { id: formId, result: false }
     })
 
-    if (!form) return res.status(200).json({
-      success: false,
-      code: 400,
-      message: "Nutrient Form doesnt exist",
-    })
+    if (!form) return res.status(400).json({ message: "Nutrient Form doesnt exist" })
 
     const result = await Nutrient_Result.create({
       formId: req.params.formId,
@@ -194,14 +160,10 @@ const writeReport = async (req, res) => {
     //update form result and endorse
     const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "Report has been generated and endorsed",
-    })
+    return res.status(200).json({ message: "Report has been generated and endorsed" })
 
   } catch (error) {
-    res.status(500).json(error.message)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 
@@ -215,13 +177,9 @@ const endorseReport = async (req, res) => {
       where: { id: formId, result: true, endorsed: false }
     })
 
-    if (!form) return res.status(200).json({
-      success: false,
-      code: 400,
-      message: "Nutrient Form doesnt exist",
-    })
+    if (!form) return res.status(200).json({ message: "Nutrient Form doesnt exist" })
+
     //update form and endorse
-    console.log('here')
     //find report
     const report = await Nutrient_Result.findOne({ where: { formId } })
     report.endorsed = true
@@ -229,14 +187,10 @@ const endorseReport = async (req, res) => {
 
     const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
 
-    return res.status(200).json({
-      success: true,
-      code: 200,
-      message: "Report has been endorsed",
-    })
+    return res.status(200).json({ message: "Report has been endorsed" })
 
   } catch (error) {
-    res.status(500).send(error.message)
+    return res.status(500).json({ error: error.messsage })
   }
 }
 

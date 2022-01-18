@@ -5,11 +5,15 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "migrate": "npx sequelize-cli db:migrate",
+    "migrate:reset": "npx sequelize-cli db:migrate:undo:all && npm run migrate && npx sequelize db:seed:all",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "pretest": "cross-env NODE_ENV=test npm run migrate:reset"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "cloudinary": "^1.28.1",
     "compression": "^1.7.4",
@@ -27,6 +31,16 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
-    "dotenv": "^10.0.0"
+    "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
+    "jest": "^27.4.7",
+    "supertest": "^6.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "verbose": true
   }
 }

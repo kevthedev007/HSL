@@ -1,27 +1,22 @@
 'use strict';
 
-const { NOW } = require("sequelize/dist");
-
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Roles', [
       {
+        id: 1,
         name: 'client',
-        createdAt: NOW(),
-        updatedAt: NOW(),
       },
       {
+        id: 2,
         name: 'pharmacist_principal',
-        createdAt: NOW(),
-        updatedAt: NOW(),
       },
       {
+        id: 3,
         name: 'doctor_principal',
-        createdAt: NOW(),
-        updatedAt: NOW(),
       },
       {
+        id: 4,
         name: 'admin'
       },
     ])

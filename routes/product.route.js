@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const { verifyToken, admin_role } = require('../utils/verify')
-const { addProduct, getAllProducts, getProductById, editProduct } = require('../controllers/productController')
+const { addProduct, getAllProducts, getProductById, editProduct } = require('../controllers/product.controller')
 const upload = require('../utils/multer');
 
 router.get('/', verifyToken, getAllProducts);

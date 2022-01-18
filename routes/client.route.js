@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { dashboard, getProfile, editProfile, updateNutrient, getReport } = require('../controllers/clientController');
+const { dashboard, getProfile, editProfile, updateNutrient, getReport } = require('../controllers/client.controller');
 const { verifyToken } = require('../utils/verify')
 
 router.get('/dashboard', verifyToken, dashboard)
