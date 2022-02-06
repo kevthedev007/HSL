@@ -1,5 +1,6 @@
 const { User, Client_Details, Nutrient_Form, Product, Product_Detail } = require('../models/index');
 const cloudinary = require('../utils/cloudinary');
+const createError = require('http-errors');
 
 
 const getAllProducts = async (req, res, next) => {
@@ -14,13 +15,13 @@ const getAllProducts = async (req, res, next) => {
 
     return res.status(200).json({ products })
 
-  } catch (err) {
-    return res.status(500).json({ error: err.message })
+  } catch (error) {
+    next(error)
   }
 }
 
 
-const getProductById = async (req, res) => {
+const getProductById = async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -33,12 +34,12 @@ const getProductById = async (req, res) => {
       }
     })
 
-    if (!product) return res.status(400).json({ message: 'Product does not exist' })
+    if (!product) throw createError.NotFound('Product does not exist')
 
     return res.status(200).json({ product })
 
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    next(error)
   }
 }
 
@@ -68,13 +69,13 @@ const addProduct = async (req, res, next) => {
 
     return res.status(201).json({ message: 'Product has been added to the store successfully' })
 
-  } catch (err) {
-    return res.status(500).json({ error: err.message })
+  } catch (error) {
+    next(error)
   }
 }
 
 
-const editProduct = async (req, res) => {
+const editProduct = async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -87,7 +88,7 @@ const editProduct = async (req, res) => {
       }
     })
 
-    if (!product) return res.status(400).json({ message: 'product does not exist' })
+    if (!product) throw createError.NotFound('product does not exist')
 
     const productMatch = {
       name: req.body.name || product.name,
@@ -114,7 +115,7 @@ const editProduct = async (req, res) => {
     res.status(200).json({ message: "Product updated successfully" })
 
   } catch (error) {
-    res.status(400).json(error.message)
+    next(error)
   }
 }
 

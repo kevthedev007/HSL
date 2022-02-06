@@ -1,7 +1,8 @@
 const { User, Client_Details, Nutrient_Form, Nutrient_Result, Suggested_Nutrient, Recommended_Supplement } = require('../models/index');
+const createError = require('http-errors');
 
 
-const getForms = async (req, res) => {
+const getForms = async (req, res, next) => {
   try {
     const forms = await Nutrient_Form.findAll({
       include: 'client',
@@ -23,12 +24,12 @@ const getForms = async (req, res) => {
     return res.status(200).json({ data })
 
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 
 
-const getFormsByReport = async (req, res) => {
+const getFormsByReport = async (req, res, next) => {
   try {
     //return forms that dont have reports
     const forms = await Nutrient_Form.findAll({
@@ -51,12 +52,12 @@ const getFormsByReport = async (req, res) => {
     })
     return res.status(200).json({ data })
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 
 
-const getFormsByEndorsed = async (req, res) => {
+const getFormsByEndorsed = async (req, res, next) => {
   try {
     const forms = await Nutrient_Form.findAll({
       where: { endorsed: false },
@@ -79,12 +80,12 @@ const getFormsByEndorsed = async (req, res) => {
     return res.status(200).json({ data })
 
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 
 
-const getFormById = async (req, res) => {
+const getFormById = async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -92,7 +93,7 @@ const getFormById = async (req, res) => {
       where: { id },
       include: 'client',
     })
-    if (!form) return res.status(200).json({ message: 'form does not exist' })
+    if (!form) throw createError.NotFound('form does not exist')
 
     const details = await Client_Details.findOne({ where: { userId: form.userId } })
 
@@ -122,12 +123,12 @@ const getFormById = async (req, res) => {
     return res.status(200).json({ data })
 
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 
 
-const writeReport = async (req, res) => {
+const writeReport = async (req, res, next) => {
   const { beneficiary_overview, research_suggestion, vitamins, minerals, herbs, foods, fruits, gold_package, platinum_package, diamond_package } = req.body;
 
   try {
@@ -137,7 +138,7 @@ const writeReport = async (req, res) => {
       where: { id: formId, result: false }
     })
 
-    if (!form) return res.status(400).json({ message: "Nutrient Form doesnt exist" })
+    if (!form) throw createError.NotFound("Nutrient Form doesnt exist")
 
     const result = await Nutrient_Result.create({
       formId: req.params.formId,
@@ -163,12 +164,12 @@ const writeReport = async (req, res) => {
     return res.status(200).json({ message: "Report has been generated and endorsed" })
 
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 
 
-const endorseReport = async (req, res) => {
+const endorseReport = async (req, res, next) => {
   try {
     const formId = req.params.formId;
 
@@ -177,7 +178,7 @@ const endorseReport = async (req, res) => {
       where: { id: formId, result: true, endorsed: false }
     })
 
-    if (!form) return res.status(200).json({ message: "Nutrient Form doesnt exist" })
+    if (!form) throw createError.NotFound("Nutrient Form doesnt exist")
 
     //update form and endorse
     //find report
@@ -190,7 +191,7 @@ const endorseReport = async (req, res) => {
     return res.status(200).json({ message: "Report has been endorsed" })
 
   } catch (error) {
-    return res.status(500).json({ error: error.messsage })
+    next(error)
   }
 }
 

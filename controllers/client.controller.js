@@ -1,7 +1,8 @@
 const { User, Client_Details, Nutrient_Form, Product } = require('../models/index');
 const sequelize = require('sequelize');
+const createError = require('http-errors');
 
-const dashboard = async (req, res) => {
+const dashboard = async (req, res, next) => {
   try {
     const detail = await Client_Details.findOne({
       where: { userId: req.user.id },
@@ -9,11 +10,11 @@ const dashboard = async (req, res) => {
     })
     return res.status(200).json({ detail })
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    next(error)
   }
 }
 
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
   try {
     const profile = await Client_Details.findOne({
       where: {
@@ -40,11 +41,11 @@ const getProfile = async (req, res) => {
       nutrient
     })
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    next(error)
   }
 }
 
-const editProfile = async (req, res) => {
+const editProfile = async (req, res, next) => {
   try {
     const client = await Client_Details.findOne({ where: { userId: req.user.id } });
 
@@ -65,7 +66,7 @@ const editProfile = async (req, res) => {
       const checkEmail = await User.findOne({ where: { email: req.body.email } });
 
       if (checkEmail) {
-        return res.status(200).json({ message: "Email already exists" })
+        throw createError.Conflict("Email already exists")
 
       } else {
         const edit = await Client_Details.update(match, { where: { userId: req.user.id } })
@@ -75,11 +76,11 @@ const editProfile = async (req, res) => {
     }
 
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    next(error)
   }
 }
 
-const updateNutrient = async (req, res) => {
+const updateNutrient = async (req, res, next) => {
   const id = req.params.id
 
   try {
@@ -119,7 +120,7 @@ const updateNutrient = async (req, res) => {
     }
 
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    next(error)
   }
 }
 
@@ -131,7 +132,7 @@ const getReport = async (req, res, next) => {
       order: [['createdAt', 'DESC']]
     })
 
-    if (nutrient.endorsed == false) return res.json({ message: 'form is not ready' })
+    if (nutrient.endorsed == false) return res.status(200).json({ message: 'form is not ready' })
 
     //get products
     const products = await Product.findAll();
@@ -150,8 +151,8 @@ const getReport = async (req, res, next) => {
         Diamond_Package: diamondPackage
       }
     })
-  } catch (err) {
-    return res.status(500).json({ error: error.message })
+  } catch (error) {
+    next(error)
   }
 }
 

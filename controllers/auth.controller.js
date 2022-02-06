@@ -4,8 +4,9 @@ const { nanoid } = require('nanoid')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { sendMail } = require('../utils/sendmail')
+const createError = require('http-errors');
 
-const clientRegister = async (req, res) => {
+const clientRegister = async (req, res, next) => {
   const { username, whatsapp_number, family_size, payment_option, nickname, gender, age, weight, height, habits, current_health_complaints, current_medication, health_fear, family_history, allergies, preferred_drug_form, usual_health_spending, proposed_monthly_budget } = req.body;
 
   const email = req.body.email.toLowerCase();
@@ -16,16 +17,16 @@ const clientRegister = async (req, res) => {
     //check if referrer exists
     if (referral_code) {
       const checkRef = await User.findOne({ where: { referral_code } })
-      if (!checkRef || null) return res.status(400).json({ message: "invalid link/referral code" })
+      if (!checkRef || null) throw createError.BadRequest("Invalid link/referral code")
     }
 
     //check if email is unique
     const checkEmail = await User.findOne({ where: { email } })
-    if (checkEmail) return res.status(400).json({ message: "Email Already Exists" });
+    if (checkEmail) throw createError.Conflict("Email Already Exists")
 
     //check if username is unique
     const checkUsername = await User.findOne({ where: { username } })
-    if (checkUsername) return res.status(400).json({ message: "Username Already Exists" });
+    if (checkUsername) throw createError.Conflict("Username Already Exists")
 
     //create password
     let password = generator.generate({ length: 10 });
@@ -76,33 +77,33 @@ const clientRegister = async (req, res) => {
       message: 'A mail has been sent to your registered mail with your login details'
     })
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    next(error)
   }
 }
 
-const clientSignin = async (req, res) => {
+const clientSignin = async (req, res, next) => {
   const { username, password } = req.body
 
   try {
     //check if username exists in database and role
     const user = await User.findOne({ where: { username, roleId: 1 } })
-    if (!user) return res.status(400).send({ message: "user does not exist, please register" })
+    if (!user) throw createError.NotFound("user does not exist, please register")
 
     //compare password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(400).send({ message: "Invalid password" })
+    if (!validPassword) throw createError.Unauthorized("Invalid password")
 
     //assign jwt token
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
     //send token
     return res.status(200).json({ token })
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    next(error)
   }
 }
 
 
-const createAdmin = async (req, res) => {
+const createAdmin = async (req, res, next) => {
   const email = req.body.email.toLowerCase();
   const password = req.body.password;
 
@@ -111,7 +112,7 @@ const createAdmin = async (req, res) => {
     const checkEmail = await User.findOne({
       where: { email }
     })
-    if (checkEmail) return res.status(400).json({ message: "Email Already Exists" });
+    if (checkEmail) throw createError.Conflict("Email Already Exists")
 
     //hash password
     let hashedPassword = await bcrypt.hash(password, 10);
@@ -119,23 +120,23 @@ const createAdmin = async (req, res) => {
     const user = await User.create({ email, password: hashedPassword, roleId: 4 });
     return res.status(201).json({ message: 'admin created' })
   } catch (error) {
-    return res.status(400).json(error.message)
+    next(error)
   }
 }
 
 
-const adminSignin = async (req, res) => {
+const adminSignin = async (req, res, next) => {
   const email = req.body.email.toLowerCase();
   const password = req.body.password
 
   try {
     //check if email exists in database and role
     const user = await User.findOne({ where: { email, roleId: 4 } })
-    if (!user) return res.status(400).send({ message: "Invalid admin email" })
+    if (!user) throw createError.NotFound("Invalid admin email")
 
     //compare password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(400).send({ message: "Invalid password" });
+    if (!validPassword) throw createError.Unauthorized("Invalid password")
 
     //assign jwt token
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
@@ -144,7 +145,7 @@ const adminSignin = async (req, res) => {
     return res.status(200).json({ token })
 
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    next(error)
   }
 }
 

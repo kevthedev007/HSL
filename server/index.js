@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const compression = require('compression');
-const cors = require('cors')
+const cors = require('cors');
+const createError = require('http-errors')
 
 const app = express();
 
@@ -32,10 +33,18 @@ app.use('/blog', blogRoutes)
 app.use('/product', productRoutes)
 
 app.use((req, res, next) => {
-  const error = new Error('Not Found')
-  res.status(404).json(`404: ${error.message}`)
+  next(createError.NotFound())
 })
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 500)
+  res.json({
+    error: {
+      status: err.status || 500,
+      message: err.message
+    }
+  })
+})
 
 module.exports = app;
 
