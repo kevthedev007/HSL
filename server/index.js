@@ -12,6 +12,8 @@ const adminRoutes = require('../routes/admin.route')
 const clientRoutes = require('../routes/client.route')
 const blogRoutes = require('../routes/blog.route')
 const productRoutes = require('../routes/product.route')
+const hslTestimonialRoutes = require('../routes/hsl_testimonial.route')
+const healthTestimonialRoutes = require('../routes/health_testimonial.route')
 
 
 //adding middlewares
@@ -31,6 +33,8 @@ app.use('/admin', adminRoutes)
 app.use('/client', clientRoutes)
 app.use('/blog', blogRoutes)
 app.use('/product', productRoutes)
+app.use('/hsl-testimonial', hslTestimonialRoutes)
+app.use('/health-testimonial', healthTestimonialRoutes)
 
 app.use((req, res, next) => {
   next(createError.NotFound())

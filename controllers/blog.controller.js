@@ -1,4 +1,4 @@
-const { User, Blog } = require('../models/index');
+const { User, Blog, Nutrient_Form } = require('../models/index');
 const sequelize = require('sequelize');
 const createError = require('http-errors');
 
@@ -61,4 +61,26 @@ const deleteBlog = async (req, res, next) => {
   }
 }
 
-module.exports = { getBlogs, postBlog, getOneBlog, deleteBlog }
+
+//TODO: FIX
+const getClientBlogs = async (req, res, next) => {
+  try {
+    const blogs = await Blog.findAll();
+    if (!blogs) throw createError.NotFound('no blogs available');
+
+    const nutrient = await Nutrient_Form.findOne({
+      where: { userId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    })
+    console.log(blogs[2].category)
+
+    //get blogs according to clients current health complaints
+    const clientBlogs = blogs.filter(blog => nutrient.current_health_complaints.includes(blog.category))
+
+    return res.status(200).json({ clientBlogs })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getBlogs, postBlog, getOneBlog, deleteBlog, getClientBlogs }
