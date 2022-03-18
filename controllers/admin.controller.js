@@ -1,5 +1,13 @@
-const { User, Client_Details, Nutrient_Form, Nutrient_Result, Suggested_Nutrient, Recommended_Supplement } = require('../models/index');
+const {
+  User,
+  Client_Details,
+  Nutrient_Form,
+  Nutrient_Result,
+  Suggested_Nutrient,
+  Recommended_Supplement,
+  Supplement_Discount } = require('../models/index');
 const createError = require('http-errors');
+const sequelize = require('sequelize')
 
 
 const getForms = async (req, res, next) => {
@@ -129,7 +137,7 @@ const getFormById = async (req, res, next) => {
 
 
 const writeReport = async (req, res, next) => {
-  const { beneficiary_overview, research_suggestion, vitamins, minerals, herbs, foods, fruits, gold_package, platinum_package, diamond_package } = req.body;
+  const { beneficiary_overview, research_suggestion, vitamins, minerals, herbs, foods, fruits, gold_package, platinum_package, diamond_package, gold_discount, platinum_discount, diamond_discount } = req.body;
 
   try {
     const formId = req.params.formId;
@@ -140,30 +148,40 @@ const writeReport = async (req, res, next) => {
 
     if (!form) throw createError.NotFound("Nutrient Form doesnt exist")
 
+    const transaction = await sequelize.transaction();
     const result = await Nutrient_Result.create({
       formId: req.params.formId,
       endorsed: true,
       beneficiary_overview, research_suggestion
-    })
+    }, { transaction });
 
     const nutrients = await Suggested_Nutrient.create({
       formId: req.params.formId,
       resultId: result.id,
       vitamins, minerals, herbs, foods, fruits
-    })
+    }, { transaction });
 
     const supplements = await Recommended_Supplement.create({
       formId: req.params.formId,
       resultId: result.id,
       gold_package, platinum_package, diamond_package
-    })
+    }, { transaction });
+
+    const discounts = await Supplement_Discount.create({
+      formId: req.params.formId,
+      resultId: result.id,
+      gold_discount, platinum_discount, diamond_discount
+    }, { transaction })
 
     //update form result and endorse
-    const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } })
+    const updateForm = await Nutrient_Form.update({ result: true, endorsed: true }, { where: { id: formId } }, { transaction });
+
+    await transaction.commit();
 
     return res.status(200).json({ message: "Report has been generated and endorsed" })
 
   } catch (error) {
+    await transaction.rollback();
     next(error)
   }
 }

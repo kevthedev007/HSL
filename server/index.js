@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const cors = require('cors');
-const createError = require('http-errors')
+const createError = require('http-errors');
+const logger = require('morgan')
 
 const app = express();
 
@@ -14,6 +15,7 @@ const blogRoutes = require('../routes/blog.route')
 const productRoutes = require('../routes/product.route')
 const hslTestimonialRoutes = require('../routes/hsl_testimonial.route')
 const healthTestimonialRoutes = require('../routes/health_testimonial.route')
+const cartRoutes = require('../routes/cart.routes')
 
 
 //adding middlewares
@@ -23,6 +25,7 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: false, limit: '60mb' }))
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(compression());
+app.use(logger('dev'));
 
 //routes
 app.get('/', (req, res) => {
@@ -35,6 +38,7 @@ app.use('/blog', blogRoutes)
 app.use('/product', productRoutes)
 app.use('/hsl-testimonial', hslTestimonialRoutes)
 app.use('/health-testimonial', healthTestimonialRoutes)
+app.use('/cart', cartRoutes);
 
 app.use((req, res, next) => {
   next(createError.NotFound())

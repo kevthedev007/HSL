@@ -128,7 +128,7 @@ const getReport = async (req, res, next) => {
   try {
     const nutrient = await Nutrient_Form.findOne({
       where: { userId: req.user.id },
-      include: ['nutrient_result', 'suggested_nutrient', 'recommended_supplement'],
+      include: ['nutrient_result', 'suggested_nutrient', 'recommended_supplement', 'supplement_discount'],
       order: [['createdAt', 'DESC']]
     })
 
@@ -145,11 +145,12 @@ const getReport = async (req, res, next) => {
       Beneficiary_Overview: nutrient.nutrient_result.beneficiary_overview,
       Research_Suggestion: nutrient.nutrient_result.research_suggestion,
       Suggested_Nutrients: nutrient.suggested_nutrient,
-      Recommened_Supplement: {
+      Recommended_Supplement: {
         Gold_Package: goldPackage,
         Platinum_Package: platinumPackage,
         Diamond_Package: diamondPackage
-      }
+      },
+      Supplement_Discounts: nutrient.supplement_discount,
     })
   } catch (error) {
     next(error)

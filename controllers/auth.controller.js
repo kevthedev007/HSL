@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { sendMail } = require('../utils/sendmail')
 const createError = require('http-errors');
+const sequelize = require("sequelize");
 
 const clientRegister = async (req, res, next) => {
   const { username, whatsapp_number, family_size, payment_option, nickname, gender, age, weight, height, habits, current_health_complaints, current_medication, health_fear, family_history, allergies, preferred_drug_form, usual_health_spending, proposed_monthly_budget } = req.body;
@@ -36,6 +37,7 @@ const clientRegister = async (req, res, next) => {
     //send mail
     sendMail(email, username, password);
 
+    const transaction = await sequelize.transaction();
     //save to user table
     const user = await User.create({
       username,
@@ -44,7 +46,7 @@ const clientRegister = async (req, res, next) => {
       roleId: 1,
       referral_code: nanoid(),
       referrer: referral_code
-    })
+    }, { transaction });
 
     //save details to client_details table
     const details = await Client_Details.create({
@@ -55,7 +57,7 @@ const clientRegister = async (req, res, next) => {
       whatsapp_number,
       family_size,
       payment_option
-    })
+    }, { transaction })
 
     //save NTR to Nutrient_Form Table
     const NTR = await Nutrient_Form.create({
@@ -71,12 +73,14 @@ const clientRegister = async (req, res, next) => {
       preferred_drug_form,
       usual_health_spending,
       proposed_monthly_budget
-    })
+    }, { transaction })
 
+    await transaction.commit();
     return res.status(201).json({
       message: 'A mail has been sent to your registered mail with your login details'
     })
   } catch (error) {
+    await transaction.rollback();
     next(error)
   }
 }

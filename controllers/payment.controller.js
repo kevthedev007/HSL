@@ -1,4 +1,5 @@
 const axios = require('axios');
+const createError = require('http-errors');
 
 const verify = async (req, res, next) => {
   console.log(req.body.ref)
@@ -35,15 +36,12 @@ const verify = async (req, res, next) => {
       }
     }
   } catch (error) {
-    return res.status(400).json({
-      status: false,
-      error: error.message
-    })
+    next(error)
   }
 }
 
 
-const webhook = async (req, res) => {
+const webhook = async (req, res, next) => {
   const event = req.body
   try {
     if (event.event == "charge.success" && event.data.status == "failed") {
@@ -67,10 +65,7 @@ const webhook = async (req, res) => {
     }
 
   } catch (error) {
-    res.status(400).json({
-      status: false,
-      error: error.mesage
-    })
+    next(error)
   }
 }
 
